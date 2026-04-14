@@ -3,6 +3,7 @@ import Chat from "./Chat.jsx";
 import { MyContext } from "./MyContext.jsx";
 import { useContext, useState, useEffect } from "react";
 import {ScaleLoader} from "react-spinners";
+import BASE_URL from "./config.js";
 
 function ChatWindow() {
     const {prompt, setPrompt, reply, setReply, currThreadId, setPrevChats, setNewChat} = useContext(MyContext);
@@ -26,7 +27,7 @@ function ChatWindow() {
         };
 
         try {
-            const response = await fetch("https://al-based-conversational-assistant-qs9j.onrender.com/api/chat", options);
+            const response = await fetch(`${BASE_URL}/api/chat`, options); // ✅ fixed
             const res = await response.json();
             console.log(res);
             setReply(res.reply);
@@ -36,7 +37,6 @@ function ChatWindow() {
         setLoading(false);
     }
 
-    //Append new chat to prevChats
     useEffect(() => {
         if(prompt && reply) {
             setPrevChats(prevChats => (
@@ -49,10 +49,8 @@ function ChatWindow() {
                 }]
             ));
         }
-
         setPrompt("");
     }, [reply]);
-
 
     const handleProfileClick = () => {
         setIsOpen(!isOpen);
@@ -69,25 +67,23 @@ function ChatWindow() {
             {
                 isOpen && 
                 <div className="dropDown">
-                    <div className="dropDownItem"><i class="fa-solid fa-gear"></i> Settings</div>
-                    <div className="dropDownItem"><i class="fa-solid fa-cloud-arrow-up"></i> Upgrade plan</div>
-                    <div className="dropDownItem"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out</div>
+                    <div className="dropDownItem"><i className="fa-solid fa-gear"></i> Settings</div>
+                    <div className="dropDownItem"><i className="fa-solid fa-cloud-arrow-up"></i> Upgrade plan</div>
+                    <div className="dropDownItem"><i className="fa-solid fa-arrow-right-from-bracket"></i> Log out</div>
                 </div>
             }
             <Chat></Chat>
 
-            <ScaleLoader color="#fff" loading={loading}>
-            </ScaleLoader>
+            <ScaleLoader color="#fff" loading={loading}></ScaleLoader>
             
             <div className="chatInput">
                 <div className="inputBox">
-                    <input placeholder="Ask anything"
+                    <input 
+                        placeholder="Ask anything"
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter'? getReply() : ''}
-                    >
-                           
-                    </input>
+                        onKeyDown={(e) => e.key === 'Enter' ? getReply() : ''}
+                    />
                     <div id="submit" onClick={getReply}><i className="fa-solid fa-paper-plane"></i></div>
                 </div>
                 <p className="info">
